@@ -23,6 +23,7 @@
 * **Backend:** Node.js + Express
 * **Database:** PostgreSQL (Running locally via Docker Compose. Relational DB is chosen to enforce strict schemas and foreign key relationships between Users and URLs).
 * **ORM:** Drizzle ORM
+* **Containerization:** Docker
 
 ### 1.4 Core Data Flow (The Redirect)
 
@@ -121,11 +122,13 @@
 * **Auth Required:** Yes (JWT)
 * **Request Body:** None
 * **Response (200 OK):**
+
     ```json
     {
       "message": "URL successfully deleted"
     }
     ```
+
   * *Security Check:* The server must verify that the `userId` of the URL matches the `id` of the currently authenticated user before deleting.
 
 ### 2.3 Core Algorithms
