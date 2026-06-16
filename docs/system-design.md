@@ -9,6 +9,7 @@
 * **Authentication:** Users must be logged in to generate short links.
 * **UX Flow:** Unauthenticated users can paste a link on the homepage, but clicking "Shorten" will prompt them to log in/sign up before the link is generated.
 * **Analytics:** The system must track the total number of clicks for each short link.
+* **Management:** Users can delete their own shortened URLs from their dashboard.
 * **Isolation:** If two different users submit the exact same long URL, they must receive different short aliases so their analytics remain separate.
 
 ### 1.2 Non-Functional Requirements
@@ -20,7 +21,7 @@
 
 * **Frontend:** React (Vite) + TypeScript
 * **Backend:** Node.js + Express
-* **Database:** PostgreSQL (Relational DB is chosen to enforce strict schemas and foreign key relationships between Users and URLs).
+* **Database:** PostgreSQL (Running locally via Docker Compose. Relational DB is chosen to enforce strict schemas and foreign key relationships between Users and URLs).
 * **ORM:** Drizzle ORM
 
 ### 1.4 Core Data Flow (The Redirect)
@@ -112,6 +113,20 @@
 * **Response (301 Moved Permanently):**
   * *Headers:* `Location: <longUrl>`
   * *Action:* Increments `clicks` counter in DB by 1 before redirecting.
+
+#### 4. Delete Short URL
+
+* **Method:** `DELETE`
+* **Endpoint:** `/api/urls/:id`
+* **Auth Required:** Yes (JWT)
+* **Request Body:** None
+* **Response (200 OK):**
+    ```json
+    {
+      "message": "URL successfully deleted"
+    }
+    ```
+  * *Security Check:* The server must verify that the `userId` of the URL matches the `id` of the currently authenticated user before deleting.
 
 ### 2.3 Core Algorithms
 
