@@ -42,7 +42,8 @@
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | UUID | Primary Key | Unique identifier for the user |
-| `name` | VARCHAR | Not Null | User's display name |
+| `firstName` | VARCHAR | Not Null | User's display first name |
+| `lastName` | VARCHAR | Not Null | User's display last name |
 | `email` | VARCHAR | Not Null, Unique | User's email address |
 | `password` | TEXT | Not Null | Hashed password |
 | `salt` | TEXT | Not Null | Random salt used for hashing |
