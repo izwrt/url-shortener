@@ -1,0 +1,36 @@
+import { z } from "zod";
+
+export const registerSchema = z.object({
+    id: z.uuid(),
+    firstName: z.string()
+        .trim()
+        .min(1,"First name is required")
+        .max(50, "First name cannot exceed 50 characters"),
+
+    lastName: z.string()
+        .trim()
+        .max(50, "First name cannot exceed 50 characters")
+        .optional(),
+
+    email: z.string()
+        .trim()
+        .toLowerCase()
+        .min(1,"Email is required")
+        .max(254, "Email is too long")
+        .email(),
+
+    password: z.string()
+        .min(12, "Password must be at least 12 characters long")
+        .max(64, "Password cannot exceed 64 characters")
+});
+
+export const loginSchema = z.object({
+    email: z.string()
+        .toLowerCase()
+        .min(1,"Email is required")
+        .max(254, "Email is too long")
+        .email('Invalid email'),
+
+    password: z.string()
+    .min(1, "Password is required")
+});

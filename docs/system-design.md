@@ -33,6 +33,11 @@
 4. Server responds with `HTTP 301 Moved Permanently` and the `longUrl` in the Location header.
 5. Client browser automatically redirects to the destination.
 
+## 1.5 Security Policy
+
+1. Password Policy: Based on modern NIST-aligned guidance, the system prioritizes password length over forced complexity.
+2. Standard: Minimum length of 12 characters, no forced special character requirements (to discourage predictable patterns), and a server-side check against known leaked password databases.
+
 ## 2. Low-Level Design (LLD)
 
 ### 2.1 Database Schema (PostgreSQL)
@@ -131,6 +136,7 @@
     ```
 
   * *Security Check:* The server must verify that the `userId` of the URL matches the `id` of the currently authenticated user before deleting.
+  * *Password: Must be a string, min 12 characters, max 64 characters. (Validation enforced via Zod; rejects common/breached passwords).
 
 ### 2.3 Core Algorithms
 
