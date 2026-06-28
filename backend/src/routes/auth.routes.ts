@@ -13,7 +13,7 @@ authRouter.post("/sign-up", async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
-    if (!firstName || !lastName || !email || !password)
+    if (!firstName || !email || !password)
       return res.status(400).json({ error: "Fields are required" });
 
     if (typeof firstName !== "string" || typeof email !== "string")
