@@ -6,28 +6,20 @@ import { userTable } from "../db/schema.js";
 import { secureThePassword } from "../utils/crypto.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { invalidCredentialsError, loginSchema, registerSchema } from "../validation/auth.validation.js";
+
 
 const authRouter: Router = Router();
 
 authRouter.post("/sign-up", async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const result = registerSchema.safeParse(req.body);
 
-    if (!firstName || !email || !password)
-      return res.status(400).json({ error: "Fields are required" });
-
-    if (typeof firstName !== "string" || typeof email !== "string")
-      return res.status(400).json({ error: "Invalid data type" });
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email))
-      return res.status(400).json({ error: "Invalid email format" });
-
-    if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ error: "Password must be atleast 8 character" });
+    if (!result.success) {
+      return res.status(400).json(result.error.flatten().fieldErrors);
     }
+
+    const { firstName, lastName, email, password } = result.data;
 
     const [existingUser] = await db
       .select()
@@ -59,12 +51,14 @@ authRouter.post("/sign-up", async (req: Request, res: Response) => {
 
 authRouter.post("/login", async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-    console.log(email);
+    const result = loginSchema.safeParse(req.body);
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Fields are missing" });
+    if (!result.success) {
+      return res.status(400).json(invalidCredentialsError);
     }
+
+    const { email, password } = result.data
+
     const [existingUser] = await db
       .select()
       .from(userTable)
@@ -72,7 +66,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       .limit(1);
 
     if (!existingUser) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(400).json(invalidCredentialsError)
     }
     const savedSalt = existingUser.salt;
     const savedPassword = existingUser.password;
@@ -80,8 +74,8 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     const { hash } = await secureThePassword(password, savedSalt);
 
     if (savedPassword !== hash) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
+      return res.status(400).json(invalidCredentialsError)
+    } 
 
     const token = jwt.sign(
       { userId: existingUser.id },
