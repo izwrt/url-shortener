@@ -6,7 +6,8 @@ import { userTable } from "../db/schema.js";
 import { secureThePassword } from "../utils/crypto.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { invalidCredentialsError, loginSchema, registerSchema } from "../validation/auth.validation.js";
+import { loginSchema, registerSchema } from "../validation/auth.validation.js";
+import { validationError, invalidCredentialsError } from "../utils/api-respose.js";
 
 
 const authRouter: Router = Router();
@@ -16,7 +17,7 @@ authRouter.post("/sign-up", async (req: Request, res: Response) => {
     const result = registerSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json(result.error.flatten().fieldErrors);
+      return res.status(400).json(validationError(result.error.flatten().fieldErrors));
     }
 
     const { firstName, lastName, email, password } = result.data;
@@ -28,7 +29,12 @@ authRouter.post("/sign-up", async (req: Request, res: Response) => {
       .limit(1);
 
     if (existingUser)
-      return res.status(409).json({ error: "Email already in use" });
+      return res.status(409)
+      .json({ error: {
+          code: "EMAIL_ALREADY_EXISTS",
+          message: "This email is already registered. Please sign in to continue." 
+        }  
+      });
 
     const { hash, salt } = await secureThePassword(password);
 
