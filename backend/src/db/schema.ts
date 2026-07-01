@@ -13,9 +13,9 @@ export const userTable = pgTable("users", {
 
 export const urlsTable = pgTable("urls", {
     id: uuid().primaryKey().defaultRandom(),
-    shortCode: varchar({ length:7 }).notNull(),
+    shortCode: varchar({ length:7 }).unique().notNull(),
     longUrl: text().notNull(),
     userId: uuid().references(() => userTable.id),
-    clicks: integer().notNull(),
+    clicks: integer().notNull().default(0),
     createdAt: timestamp().defaultNow().notNull()
 });

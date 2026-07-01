@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-    firstName: z.string()
+    firstName: z.string({ error: "First name is required" })
         .trim()
         .min(1,"First name is required")
         .max(50, "First name cannot exceed 50 characters"),
@@ -11,14 +11,14 @@ export const registerSchema = z.object({
         .max(50, "First name cannot exceed 50 characters")
         .optional(),
 
-    email: z.string()
+    email: z.string({ error: "Email is required" })
         .trim()
         .toLowerCase()
         .min(1,"Email is required")
         .max(255, "Email is too long")
         .email(),
 
-    password: z.string()
+    password: z.string({ error: "Password is required" })
         .min(12, "Password must be at least 12 characters long")
         .max(64, "Password cannot exceed 64 characters")
 });
@@ -27,10 +27,12 @@ export const loginSchema = z.object({
     email: z.string()
         .trim()
         .toLowerCase()
-        .min(1,"Email is required")
-        .max(255, "Email is too long")
+        .min(1)
+        .max(255)
         .email(),
 
     password: z.string()
-    .min(1, "Password is required")
+    .min(1)
 });
+
+
