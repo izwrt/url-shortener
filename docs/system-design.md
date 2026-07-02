@@ -37,6 +37,7 @@
 
 1. Password Policy: Based on modern NIST-aligned guidance, the system prioritizes password length over forced complexity.
 2. Standard: Minimum length of 12 characters, no forced special character requirements (to discourage predictable patterns), and a server-side check against known leaked password databases.
+3. Oauth sign using google.
 
 ## 2. Low-Level Design (LLD)
 
