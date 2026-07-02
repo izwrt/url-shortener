@@ -9,7 +9,6 @@ import "dotenv/config";
 import { loginSchema, registerSchema } from "../validation/auth.validation.js";
 import { validationError, invalidCredentialsError } from "../utils/api-respose.js";
 
-
 const authRouter: Router = Router();
 
 authRouter.post("/sign-up", async (req: Request, res: Response) => {
