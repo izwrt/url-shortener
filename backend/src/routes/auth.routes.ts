@@ -21,7 +21,7 @@ authRouter.post("/sign-up", async (req: Request, res: Response) => {
         .json(validationError(z.flattenError(result.error).fieldErrors));
     }
 
-    await registerUser(result?.data);
+    await registerUser(result.data);
 
     return res.status(201).json({
       message: "User created",
@@ -46,7 +46,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     const result = loginSchema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json(invalidCredentialsError);
+      return res.status(401).json(invalidCredentialsError);
     }
     
     const token = await loginUser(result.data);
@@ -54,7 +54,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 
   } catch (error) {
     if (error instanceof Error && error.message === "INVALID_CREDENTIALS") {
-      return res.status(400).json(invalidCredentialsError);
+      return res.status(401).json(invalidCredentialsError);
     }
 
     console.error(error);
