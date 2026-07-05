@@ -4,7 +4,7 @@ import { userTable } from "./schema.js"
 
 interface UserData {
       firstName: string,
-      lastName?: string,
+      lastName?: string | undefined,
       email: string,
       password: string,
       salt: string,

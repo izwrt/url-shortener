@@ -26,7 +26,7 @@ export const registerUser = async (userData: UserData) => {
 
   await createUser({
     firstName: userData.firstName,
-    lastName: userData.lastName ?? "",
+    lastName: userData.lastName,
     email: userData.email,
     password: hash,
     salt: salt,
