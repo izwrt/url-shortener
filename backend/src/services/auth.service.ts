@@ -1,13 +1,19 @@
 import { getUserByEmail, createUser } from "../db/user.queries.js";
 import { secureThePassword } from "../utils/crypto.js";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 interface UserData {
-      firstName: string,
-      lastName?: string | undefined,
-      email: string,
-      password: string,
-    }
+  firstName: string;
+  lastName?: string | undefined;
+  email: string;
+  password: string;
+}
+
+interface LoginData {
+  email: string;
+  password: string;
+}
 
 export const registerUser = async (userData: UserData) => {
   const existingUser = await getUserByEmail(userData.email);
@@ -25,4 +31,25 @@ export const registerUser = async (userData: UserData) => {
     password: hash,
     salt: salt,
   });
+};
+
+export const loginUser = async (loginData: LoginData) => {
+  const existingUser = await getUserByEmail(loginData.email);
+
+  if (!existingUser) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
+
+  const savedSalt = existingUser.salt;
+  const savedPassword = existingUser.password;
+  const { hash } = await secureThePassword(loginData.password, savedSalt);
+
+  if (savedPassword !== hash) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
+  const token = jwt.sign({ userId: existingUser.id },    process.env.JWT_SECRET!, {
+    expiresIn: "7d",
+  });
+
+  return token;
 };
