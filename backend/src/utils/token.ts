@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { jwtPayloadSchema } from "../validation/token.validation.js";
 
 export const createToken = (userId: string) => {
-  const validationResult = jwtPayloadSchema.safeParse(userId);
+  const validationResult = jwtPayloadSchema.safeParse({ userId });
   
   if (!validationResult.success) {
     throw new Error("INVALID_TOKEN_PAYLOAD");

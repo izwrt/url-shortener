@@ -49,5 +49,7 @@ export const loginUser = async (loginData: LoginData) => {
     throw new Error("INVALID_CREDENTIALS");
   }
   
-  createToken(existingUser.id);
+  const token = createToken(existingUser.id);
+
+  return token
 };
