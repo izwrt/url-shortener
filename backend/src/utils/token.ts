@@ -10,7 +10,7 @@ export const createToken = (userId: string) => {
 
   const payloadData = validationResult.data 
 
-  const token = jwt.sign({ payloadData }, process.env.JWT_SECRET!, {
+  const token = jwt.sign( payloadData, process.env.JWT_SECRET!, {
     expiresIn: "7d",
   });
 
