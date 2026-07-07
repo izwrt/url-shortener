@@ -2,6 +2,7 @@ import { getUserByEmail, createUser } from "../db/user.queries.js";
 import { secureThePassword } from "../utils/crypto.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { createToken } from "../utils/token.js";
 
 interface UserData {
   firstName: string;
@@ -47,9 +48,8 @@ export const loginUser = async (loginData: LoginData) => {
   if (savedPassword !== hash) {
     throw new Error("INVALID_CREDENTIALS");
   }
-  const token = jwt.sign({ userId: existingUser.id },    process.env.JWT_SECRET!, {
-    expiresIn: "7d",
-  });
+  
+  const token = createToken(existingUser.id);
 
-  return token;
+  return token
 };
