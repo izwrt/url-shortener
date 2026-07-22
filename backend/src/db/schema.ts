@@ -13,9 +13,14 @@ export const userTable = pgTable("users", {
 
 export const urlsTable = pgTable("urls", {
     id: uuid().primaryKey().defaultRandom(),
-    shortCode: varchar({ length:7 }).unique().notNull(),
+    shortCode: varchar({ length:50 }).unique().notNull(),
     longUrl: text().notNull(),
     userId: uuid().references(() => userTable.id),
     clicks: integer().notNull().default(0),
     createdAt: timestamp().defaultNow().notNull()
+});
+
+export const counterTable = pgTable("counters", {
+    id: integer().primaryKey().default(1),
+    value: integer().notNull().default(10000000), // High starting number ensures Base62 is at least 4-5 chars long
 });

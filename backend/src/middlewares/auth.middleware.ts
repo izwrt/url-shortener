@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { tokenExpiredError, unauthorizedError } from "../utils/api-respose.js";
 import { verifyToken } from "../utils/token.js";
 
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const hasAuthHeader = req.headers.authorization;
 
   if (!hasAuthHeader && !hasAuthHeader?.startsWith("Bearer ")) {
@@ -20,7 +20,7 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     req.user = decodedToken;
     next();
   } catch (error) {
-    if (error === "TokenExpiredError") {
+    if (error instanceof Error && error.name === "TokenExpiredError") {
       return res.status(401).json(tokenExpiredError);
     }
     return res.status(401).json(unauthorizedError);
