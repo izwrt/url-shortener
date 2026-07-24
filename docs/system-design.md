@@ -4,7 +4,7 @@
 
 ### 1.1 Functional Requirements
 
-* **Shortening:** The system must take a long URL and generate a unique, random 6-character alias.
+* **Shortening:** The system must take a long URL and generate a unique Base62 alias, or accept a custom vanity alias provided by the user.
 * **Redirection:** When a user visits the short alias, the system must issue an HTTP 301 redirect to the original long URL.
 * **Authentication:** Users must be logged in to generate short links.
 * **UX Flow:** Unauthenticated users can paste a link on the homepage, but clicking "Shorten" will prompt them to log in/sign up before the link is generated.
@@ -60,11 +60,18 @@
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | UUID | Primary Key | Unique identifier for the URL record |
-| `shortCode` | VARCHAR(7) | Not Null, Unique | The generated random alias (e.g., 'x7B9aQ') |
+| `shortCode` | VARCHAR(50) | Not Null, Unique | The generated Base62 alias or custom vanity URL |
 | `longUrl` | TEXT | Not Null | The original destination URL |
 | `userId` | UUID | Not Null, Foreign Key | Links to `users.id` (Owner of the URL) |
 | `clicks` | INTEGER | Not Null, Default 0 | Analytics counter for visits |
 | `createdAt` | TIMESTAMP | Default NOW() | When the short link was generated |
+
+**Table: `counters`**
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | INTEGER | Primary Key | Always 1 (Single row table) |
+| `value` | INTEGER | Not Null, Default 10000000 | Global counter for Base62 encoding |
 
 ### 2.2 API Contracts
 
@@ -77,8 +84,10 @@
 
     ```json
     {
-      "longUrl": "https://www.example.com/very/long/path"
+      "longUrl": "https://www.example.com/very/long/path",
+      "customAlias": "my-promo" 
     }
+    *Note: `customAlias` is optional.*
     ```
 
 * **Response (201 Created):**
@@ -143,8 +152,14 @@
 
 **Short Code Generation & Collision Handling:**
 
-1. Receive `longUrl` from authenticated user.
-2. Generate a random 7-character alphanumeric string using the `nanoid` library.
-3. Attempt to `INSERT` into the `urls` table.
-4. If the database throws a `Unique Constraint Violation` (meaning the code already exists), catch the error, generate a new code, and retry the insert.
+1. Receive `longUrl` and optional `customAlias` from authenticated user.
+2. If `customAlias` is provided:
+   a. Check if it already exists in the `urls` table.
+   b. If it exists, return `409 Conflict` (Already Taken).
+   c. If it does not exist, use it as the `shortCode`.
+3. If no `customAlias` is provided (Auto-Generation):
+   a. Execute `UPDATE counters SET value = value + 1 WHERE id = 1 RETURNING value;`
+   b. Convert the returned integer `value` into a Base62 string (using characters `[a-zA-Z0-9]`).
+   c. Use the resulting string as the `shortCode`.
+4. `INSERT` the `shortCode`, `longUrl`, and `userId` into the `urls` table.
 5. Return the successful `shortCode` to the user.

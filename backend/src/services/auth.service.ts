@@ -1,6 +1,5 @@
 import { getUserByEmail, createUser } from "../db/user.queries.js";
 import { secureThePassword } from "../utils/crypto.js";
-import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { createToken } from "../utils/token.js";
 

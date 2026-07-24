@@ -16,3 +16,17 @@ export const invalidCredentialsError = {
     message: "Invalid email or password",
   },
 };
+
+export const unauthorizedError = {
+  error: {
+    code: "UNAUTHORIZED",
+    message: "You must be logged in to access this resource"
+  }
+}
+
+export const tokenExpiredError = {
+  error: {
+    code: "TOKEN_EXPIRED",
+    message: "Your session has expired. Please log in again.",
+  },
+};

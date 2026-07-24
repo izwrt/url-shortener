@@ -16,3 +16,7 @@ export const createToken = (userId: string) => {
 
   return token;
 };
+
+export const verifyToken = (token: string) => {
+  return jwt.verify(token, process.env.JWT_SECRET!);
+}
