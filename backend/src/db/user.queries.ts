@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import db from './index.js'
-import { userTable } from "./schema.js"
+import { urlsTable, userTable } from "./schema.js"
 
 interface UserData {
       firstName: string,
@@ -18,4 +18,8 @@ export const getUserByEmail = async(email: string) => {
 
 export const createUser = async(user: UserData) => {
     await db.insert(userTable).values(user);
+}
+
+export const createShortCode = async(url:any) => {
+    await db.insert(urlsTable).values(url)
 }
